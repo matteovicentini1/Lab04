@@ -3,6 +3,7 @@ import flet as ft
 class View(object):
     def __init__(self, page: ft.Page):
         # Page
+        self.btnavvio = None
         self.page = page
         self.page.title = "TdP 2024 - Lab 04 - SpellChecker ++"
         self.page.horizontal_alignment = 'CENTER'
@@ -27,8 +28,19 @@ class View(object):
         )
 
         # Add your stuff here
+        self.menutendina = ft.Dropdown(label="Lingua",width=150)
+        self.menutenda()
+        r1 = ft.Row([self.menutendina])
+        self.selezione = ft.Dropdown(label="Tipologia di ricerca",width=130)
+        self.fillselezione()
+        self.testo = ft.TextField(label='Sentences',width=200)
+        self.btnavvio=ft.ElevatedButton(text='search',icon=ft.icons.SEARCH,on_click=self.bottone)
+        r2 =ft.Row([self.selezione,self.testo,self.btnavvio],alignment=ft.MainAxisAlignment.CENTER)
+        self.parole=''
+        self.time =0
+        self.lv1=ft.ListView()
 
-        self.page.add([])
+        self.page.add(r1,r2,self.lv1)
 
         self.page.update()
 
@@ -51,3 +63,39 @@ class View(object):
         #     ft.colors.GREY_900 if self.page.theme_mode == ft.ThemeMode.DARK else ft.colors.GREY_300
         # )
         self.page.update()
+
+    def menutenda(self):
+        self.menutendina.options.append(ft.dropdown.Option("italian"))
+        self.menutendina.options.append(ft.dropdown.Option("english"))
+        self.menutendina.options.append(ft.dropdown.Option("spanish"))
+    def fillselezione(self):
+        self.selezione.options.append(ft.dropdown.Option('Default'))
+        self.selezione.options.append(ft.dropdown.Option('Linear'))
+        self.selezione.options.append(ft.dropdown.Option('Dichotomic'))
+
+    def bottone(self,e):
+        if self.selezione.value is None or self.testo.value=='' or self.menutendina.value not in ("italian","english","spanish") :
+            self.lv1.controls.append(ft.Text(f'Campo/i vuoto/i'))
+            self.testo.value = ''
+            self.menutendina.value = None
+            self.selezione.value = None
+            self.page.update()
+        else:
+            (self.parole,self.time) = self.__controller.handleSentence(self.testo.value,self.menutendina.value,self.selezione.value)
+            self.lv1.controls.append(ft.Text(f'testo: {self.testo.value}'))
+            self.lv1.controls.append(ft.Text(f'parole errate:{self.parole}'))
+            self.lv1.controls.append(ft.Text(f'tempo:{self.time}'))
+            self.testo.value=''
+            self.menutendina.value=None
+            self.selezione.value=None
+            self.page.update()
+            self.time=0
+            self.parole=''
+
+
+
+
+
+
+
+
